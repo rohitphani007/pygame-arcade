@@ -11,6 +11,12 @@ git clone https://github.com/your-username/pygame-arcade.git
 cd pygame-arcade
 ```
 
+### Create / Pick & Get Assigned an Issue
+
+- Go to the **Issues** tab  
+- Create or Choose an issue you want to work on  
+- Comment to get assigned
+
 ### Create a Branch
 
 ```
@@ -29,4 +35,4 @@ git push origin feature-name
 ### Create Pull Request
 - Go to your fork on GitHub
 - Click Compare & pull request
-- Add a clear title and description
+- Add a clear title and description (What you changed, Which issue it fixes (Fixes #issue_number))
