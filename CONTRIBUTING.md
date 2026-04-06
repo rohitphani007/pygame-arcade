@@ -1,3 +1,20 @@
+## Learning Resources
+
+If you are new to Pygame, you can learn from:
+
+https://www.geeksforgeeks.org/python/pygame-tutorial/
+
+---
+## Contribution Guidelines
+
+- One issue = one pull request
+- Do not modify unrelated files
+- Ensure the project runs before submitting
+- Keep code simple and readable
+- Discuss with the maintainer if something is unclear
+
+---
+
 ## Steps to Contribute
 
 ### Fork the Repository
