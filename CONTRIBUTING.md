@@ -6,7 +6,8 @@ https://www.geeksforgeeks.org/python/pygame-tutorial/
 
 ---
 ## Contribution Guidelines
-
+> [!NOTE]
+> We explicitly don't welcome the use of AI tools as assistants, but if you do, then remain fully responsible for your contributions. You must understand the code you submit, ensure it meets our quality standards, and explicitly disclose any AI assistance.
 - One issue = one pull request
 - Do not modify unrelated files
 - Ensure the project runs before submitting
