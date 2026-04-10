@@ -1,6 +1,6 @@
 # Pygame Arcade 
 
-Pygame Arcade is a collection of three simple games built using Pygame. The idea behind this project was to keep things easy to understand while still being fun to play and explore.
+Pygame Arcade is a collection of three simple games built using Pygame.
 
 ---
 
