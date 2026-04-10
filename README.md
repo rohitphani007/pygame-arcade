@@ -59,15 +59,6 @@ python launcher.py
 ```
 This will open a simple menu where you can pick a game.
 
----
-
-## Notes
-
-- The code is written to be beginner-friendly.
-- Each game runs independently, so you can work on one without breaking the others.
-- Shared logic (like common functions or constants) is kept in the common/ folder.
-
----
 
 ## Contributing
 
