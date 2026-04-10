@@ -38,7 +38,7 @@ crashed = False
 crash_time = 0
 
 def create_pipe(x):
-    min_gap = bird_h + 25
+    min_gap = bird_h+65
     max_gap = 180
 
     gap = random.randint(min_gap, max_gap)
