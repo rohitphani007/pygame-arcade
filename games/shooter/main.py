@@ -64,6 +64,11 @@ while running:
         if keys[pygame.K_RIGHT]:
             player_x += 5
 
+        if player_x > width - 40:
+            player_x = width - 40
+        elif player_x < 0:
+            player_x = 0
+
         timer += 1
         if timer % 60 == 0:
             speed += 0.03
