@@ -51,6 +51,9 @@ for i in range(3):
     pipes.append(create_pipe(width + i*200))
 
 running = True
+
+paused = False
+
 while running:
     screen.blit(bg,(0,0))
 
@@ -59,14 +62,17 @@ while running:
             running = False
 
         if event.type == pygame.KEYDOWN:
+
+            if event.key == pygame.K_p:
+                paused = not paused
             if not started:
                 started = True
-            if event.key == pygame.K_SPACE and not crashed:
+            if event.key == pygame.K_SPACE and not crashed and not paused:
                 velocity = -6
 
     bird_rect = pygame.Rect(100,int(bird_y),bird_w,bird_h)
 
-    if started and not crashed:
+    if started and not crashed and not paused:
         velocity += gravity
         bird_y += velocity
 
@@ -75,7 +81,7 @@ while running:
             speed += 0.03
 
     for pipe in pipes:
-        if started and not crashed:
+        if started and not crashed and not paused:
             pipe[0] -= speed
 
         top_rect = pygame.Rect(pipe[0],0,pipe_width,pipe[1])
@@ -84,22 +90,22 @@ while running:
         pygame.draw.rect(screen, black, top_rect)
         pygame.draw.rect(screen, black, bottom_rect)
 
-        if not crashed and bird_rect.colliderect(top_rect):
+        if not crashed and bird_rect.colliderect(top_rect) and not paused:
             bird_y = top_rect.bottom - bird_h
             crashed = True
             crash_time = pygame.time.get_ticks()
 
-        if not crashed and bird_rect.colliderect(bottom_rect):
+        if not crashed and bird_rect.colliderect(bottom_rect) and not paused:
             bird_y = bottom_rect.top
             crashed = True
             crash_time = pygame.time.get_ticks()
 
-        if pipe[0] < -pipe_width and not crashed:
+        if pipe[0] < -pipe_width and not crashed and not paused:
             pipes.remove(pipe)
             pipes.append(create_pipe(width))
             score += 1
 
-    if started and not crashed:
+    if started and not crashed and not paused:
         if bird_y > height or bird_y < 0:
             crashed = True
             crash_time = pygame.time.get_ticks()
@@ -108,6 +114,10 @@ while running:
 
     text = font.render(f"Score: {score}", True, white)
     screen.blit(text,(width-120,10))
+
+    if paused:
+        paused_text = font.render("PAUSED", True, white)
+        screen.blit(paused_text, (width//2 - 50,height//2 - 15))
 
     if not started:
         msg = font.render("Press any key to start", True, white)

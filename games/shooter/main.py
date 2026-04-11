@@ -39,6 +39,7 @@ speed = 0.8
 timer = 0
 score = 0
 started = False
+paused = False
 
 while len(enemies) < 2:
     img = enemy1 if random.randint(0,1)==0 else enemy2
@@ -54,10 +55,17 @@ while running:
 
         if event.type == pygame.KEYDOWN:
             started = True
-            if event.key == pygame.K_SPACE:
+
+            if event.key == pygame.K_p:
+                paused = not paused
+            if event.key == pygame.K_SPACE and not paused:
                 bullets.append([player_x+15,height-40])
 
-    if started:
+    if paused:
+        paused_text = font.render("PAUSED", True, white)
+        screen.blit(paused_text, (width//2 - 50,height//2 - 15))
+
+    if started and not paused:
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
             player_x -= 5
@@ -81,14 +89,14 @@ while running:
     screen.blit(player_img,(player_x,height-40))
 
     for bullet in bullets[:]:
-        if started:
+        if started and not paused:
             bullet[1] -= 7
         screen.blit(bullet_img,(bullet[0],bullet[1]))
         if bullet[1] < 0:
             bullets.remove(bullet)
 
     for enemy in enemies[:]:
-        if started:
+        if started and not paused:
             enemy[1] += speed
         screen.blit(enemy[2],(enemy[0],enemy[1]))
 
