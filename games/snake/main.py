@@ -41,6 +41,7 @@ for _ in range(25):
 speed = 8
 score = 0
 started = False
+paused = False
 
 running = True
 while running:
@@ -52,16 +53,23 @@ while running:
 
         if event.type == pygame.KEYDOWN:
             started = True
-            if event.key == pygame.K_UP:
+
+            if event.key == pygame.K_p:
+                paused = not paused
+            if event.key == pygame.K_UP and dy != 10:
                 dx,dy = 0,-10
-            if event.key == pygame.K_DOWN:
+            if event.key == pygame.K_DOWN and dy != -10:
                 dx,dy = 0,10
-            if event.key == pygame.K_LEFT:
+            if event.key == pygame.K_LEFT and dx != 10:
                 dx,dy = -10,0
-            if event.key == pygame.K_RIGHT:
+            if event.key == pygame.K_RIGHT and dx != -10:
                 dx,dy = 10,0
 
-    if started:
+    if paused:
+        paused_text = font.render("PAUSED", True, white)
+        screen.blit(paused_text, (width//2 - 50,height//2 - 15))
+
+    if started and not paused:
         head = (snake[0][0]+dx, snake[0][1]+dy)
         snake.insert(0, head)
 
@@ -78,6 +86,11 @@ while running:
             running = False
 
         if head in obstacles:
+            running = False
+
+        body = snake.copy()
+        body.pop(0)
+        if head in body:
             running = False
 
     for s in snake:
