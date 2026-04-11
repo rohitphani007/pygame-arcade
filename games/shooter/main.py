@@ -89,7 +89,6 @@ while running:
 
     player_rect = pygame.Rect(player_x,player_y,40,40)
     screen.blit(player_img,(player_x,player_y))
-    screen.blit(player_img,(player_x,player_y))
 
     for bullet in bullets[:]:
         if started:
