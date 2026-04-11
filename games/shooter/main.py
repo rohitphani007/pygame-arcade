@@ -1,3 +1,4 @@
+import leaderboard
 import pygame
 import random
 import os
@@ -42,6 +43,11 @@ score = 0
 started = False
 paused = False
 
+score_sent = False
+game_over = False
+player_name = input("PLAYER, ENTER YOUR NAME: ")
+top_scores = []
+
 while len(enemies) < 2:
     img = enemy1 if random.randint(0,1)==0 else enemy2
     enemies.append([random.randint(0,width-40),0,img])
@@ -55,17 +61,19 @@ while running:
             running = False
 
         if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                running = False
             started = True
             if event.key == pygame.K_p:
                 paused = not paused
-            if event.key == pygame.K_SPACE and not paused:
+            if event.key == pygame.K_SPACE and not paused and not game_over:
                 bullets.append([player_x+15,player_y])
 
     if paused:
         paused_text = font.render("PAUSED", True, white)
         screen.blit(paused_text, (width//2 - 50,height//2 - 15))
 
-    if started and not paused:
+    if started and not paused and not game_over:
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
             player_x -= 5
@@ -98,25 +106,25 @@ while running:
     screen.blit(player_img,(player_x,player_y))
 
     for bullet in bullets[:]:
-        if started and not paused:
+        if started and not paused and not game_over:
             bullet[1] -= 7
         screen.blit(bullet_img,(bullet[0],bullet[1]))
         if bullet[1] < 0:
             bullets.remove(bullet)
 
     for enemy in enemies[:]:
-        if started and not paused:
+        if started and not paused and not game_over:
             enemy[1] += speed
         screen.blit(enemy[2],(enemy[0],enemy[1]))
 
         enemy_rect = pygame.Rect(enemy[0],enemy[1],40,40)
 
-        if started and (enemy_rect.colliderect(player_rect) or enemy[1] > height):
-            running = False
+        if started and not game_over and (enemy_rect.colliderect(player_rect) or enemy[1] > height):
+            game_over = True
 
         for bullet in bullets[:]:
             bullet_rect = pygame.Rect(bullet[0],bullet[1],10,20)
-            if bullet_rect.colliderect(enemy_rect):
+            if bullet_rect.colliderect(enemy_rect) and not game_over:
                 bullets.remove(bullet)
                 enemies.remove(enemy)
                 score += 1
@@ -128,6 +136,32 @@ while running:
     if not started:
         msg = font.render("Press any key to start", True, white)
         screen.blit(msg,(180,180))
+
+    if game_over:
+        if not score_sent:
+            leaderboard.submit_score(player_name, score)
+            top_scores = leaderboard.get_top_scores()
+            score_sent = True
+        
+        overlay = pygame.Surface((width, height))
+        overlay.set_alpha(180)
+        overlay.fill((0, 0, 0))
+        screen.blit(overlay, (0, 0))
+
+        msg = font.render("GAME OVER", True, red)
+        screen.blit(msg, (width // 2 - 60, height // 2 - 80))
+        
+        title = font.render("GLOBAL TOP 5 (SHOOTER):", True, (255, 215, 0))
+        screen.blit(title, (width // 2 - 120, height // 2 - 40))
+
+        y_off = 0
+        for entry in top_scores:
+            y_off += 30
+            score_txt = font.render(f"{entry['name']}: {entry['score']}", True, white)
+            screen.blit(score_txt, (width // 2 - 100, height // 2 - 40 + y_off))
+
+        restart_msg = font.render("Press Esc to Quit", True, (200, 200, 200))
+        screen.blit(restart_msg, (width // 2 - 70, height // 2 + 150))
 
     pygame.display.update()
     clock.tick(fps)

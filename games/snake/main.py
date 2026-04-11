@@ -1,3 +1,4 @@
+import leaderboard
 import pygame
 import random
 import os
@@ -43,6 +44,11 @@ score = 0
 started = False
 paused = False
 
+score_sent = False
+game_over = False
+player_name = input("PLAYER, ENTER YOUR NAME: ")
+top_scores = []
+
 running = True
 while running:
     screen.blit(bg,(0,0))
@@ -52,6 +58,8 @@ while running:
             running = False
 
         if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                running = False
             started = True
 
             if event.key == pygame.K_p:
@@ -69,7 +77,7 @@ while running:
         paused_text = font.render("PAUSED", True, white)
         screen.blit(paused_text, (width//2 - 50,height//2 - 15))
 
-    if started and not paused:
+    if started and not paused and not game_over:
         head = (snake[0][0]+dx, snake[0][1]+dy)
         snake.insert(0, head)
 
@@ -83,15 +91,15 @@ while running:
             snake.pop()
 
         if head[0] < 0 or head[0] >= width or head[1] < 0 or head[1] >= height:
-            running = False
+            game_over = True
 
         if head in obstacles:
-            running = False
+            game_over = True
 
         body = snake.copy()
         body.pop(0)
         if head in body:
-            running = False
+            game_over = True
 
     for s in snake:
         pygame.draw.rect(screen, green, (*s,10,10))
@@ -107,6 +115,32 @@ while running:
     if not started:
         msg = font.render("Press any key to start", True, white)
         screen.blit(msg,(180,180))
+
+    if game_over:
+        if not score_sent:
+            leaderboard.submit_score(player_name, score)
+            top_scores = leaderboard.get_top_scores()
+            score_sent = True
+        
+        overlay = pygame.Surface((width, height))
+        overlay.set_alpha(180)
+        overlay.fill((0, 0, 0))
+        screen.blit(overlay, (0, 0))
+
+        msg = font.render("GAME OVER", True, red)
+        screen.blit(msg, (width // 2 - 60, height // 2 - 80))
+        
+        title = font.render("GLOBAL TOP 5 (SNAKE):", True, (255, 215, 0))
+        screen.blit(title, (width // 2 - 100, height // 2 - 40))
+
+        y_off = 0
+        for entry in top_scores:
+            y_off += 30
+            score_txt = font.render(f"{entry['name']}: {entry['score']}", True, white)
+            screen.blit(score_txt, (width // 2 - 100, height // 2 - 40 + y_off))
+
+        restart_msg = font.render("Press Esc to Quit", True, (200, 200, 200))
+        screen.blit(restart_msg, (width // 2 - 70, height // 2 + 150))
 
     pygame.display.update()
     clock.tick(speed)

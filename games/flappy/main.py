@@ -1,3 +1,4 @@
+import leaderboard
 import pygame
 import random
 import os
@@ -38,6 +39,10 @@ crashed = False
 crash_time = 0
 paused = False
 
+score_sent = False
+player_name = input("PLAYER, ENTER YOUR NAME: ")
+top_scores = []
+
 def create_pipe(x):
     min_gap = bird_h + 65
     max_gap = 180
@@ -58,6 +63,9 @@ while running:
             running = False
 
         if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                running = False
+            
             if event.key == pygame.K_p:
                 paused = not paused
             
@@ -121,8 +129,30 @@ while running:
         screen.blit(msg, (180, 180))
 
     if crashed:
-        if pygame.time.get_ticks() - crash_time > 1000:
-            running = False
+        if not score_sent:
+            leaderboard.submit_score(player_name, score)
+            top_scores = leaderboard.get_top_scores()
+            score_sent = True
+        
+        overlay = pygame.Surface((width, height))
+        overlay.set_alpha(180)
+        overlay.fill((0, 0, 0))
+        screen.blit(overlay, (0, 0))
+
+        msg = font.render("GAME OVER", True, red)
+        screen.blit(msg, (width // 2 - 60, height // 2 - 80))
+        
+        title = font.render("GLOBAL TOP 5 (FLAPPY):", True, (255, 215, 0))
+        screen.blit(title, (width // 2 - 110, height // 2 - 40))
+
+        y_off = 0
+        for entry in top_scores:
+            y_off += 30
+            score_txt = font.render(f"{entry['name']}: {entry['score']}", True, white)
+            screen.blit(score_txt, (width // 2 - 100, height // 2 - 40 + y_off))
+
+        restart_msg = font.render("Press Esc to Quit", True, (200, 200, 200))
+        screen.blit(restart_msg, (width // 2 - 70, height // 2 + 150))
 
     pygame.display.update()
     clock.tick(fps)
