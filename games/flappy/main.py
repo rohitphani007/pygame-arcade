@@ -89,11 +89,11 @@ while running:
         pygame.draw.rect(screen, black, top_rect)
         pygame.draw.rect(screen, black, bottom_rect)
 
-        if not crashed and bird_rect.colliderect(top_rect):
+        if not crashed and bird_rect.colliderect(top_rect) and not paused:
             crashed = True
             crash_time = pygame.time.get_ticks()
 
-        if not crashed and bird_rect.colliderect(bottom_rect):
+        if not crashed and bird_rect.colliderect(bottom_rect) and not paused:
             crashed = True
             crash_time = pygame.time.get_ticks()
 
