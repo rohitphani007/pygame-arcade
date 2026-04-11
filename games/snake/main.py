@@ -52,13 +52,13 @@ while running:
 
         if event.type == pygame.KEYDOWN:
             started = True
-            if event.key == pygame.K_UP:
+            if event.key == pygame.K_UP and dy != 10:
                 dx,dy = 0,-10
-            if event.key == pygame.K_DOWN:
+            if event.key == pygame.K_DOWN and dy != -10:
                 dx,dy = 0,10
-            if event.key == pygame.K_LEFT:
+            if event.key == pygame.K_LEFT and dx != 10:
                 dx,dy = -10,0
-            if event.key == pygame.K_RIGHT:
+            if event.key == pygame.K_RIGHT and dx != -10:
                 dx,dy = 10,0
 
     if started:
@@ -78,6 +78,11 @@ while running:
             running = False
 
         if head in obstacles:
+            running = False
+
+        body = snake.copy()
+        body.pop(0)
+        if head in body:
             running = False
 
     for s in snake:
