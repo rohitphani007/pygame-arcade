@@ -70,26 +70,39 @@ while running:
             if event.key == pygame.K_SPACE and not crashed and not paused:
                 velocity = -6
 
+<<<<<<< HEAD
     bird_rect = pygame.Rect(100,int(bird_y),bird_w,bird_h)
 
     if started and not crashed and not paused:
         velocity += gravity
         bird_y += velocity
+=======
+    if started and not crashed:
+                velocity += gravity
+                bird_y += velocity
+>>>>>>> 6ed42d4 (Improved Flappy Collision Accuracy)
 
-        timer += 1
-        if timer % 60 == 0:
-            speed += 0.03
+                timer += 1
+                if timer % 60 == 0:
+                    speed += 0.03    
+
+    bird_rect = pygame.Rect(100,int(bird_y),bird_w,bird_h)
+    bird_rect=bird_rect.inflate(-16,-16)
+    offset = (bird_h - bird_rect.height) // 2
 
     for pipe in pipes:
         if started and not crashed and not paused:
             pipe[0] -= speed
 
         top_rect = pygame.Rect(pipe[0],0,pipe_width,pipe[1])
+        draw_tr= pygame.Rect(pipe[0],0,pipe_width,pipe[1])
         bottom_rect = pygame.Rect(pipe[0],pipe[1]+pipe[2],pipe_width,height)
+        draw_br= pygame.Rect(pipe[0],pipe[1]+pipe[2],pipe_width,height)
 
-        pygame.draw.rect(screen, black, top_rect)
-        pygame.draw.rect(screen, black, bottom_rect)
+        pygame.draw.rect(screen, black, draw_tr)
+        pygame.draw.rect(screen, black, draw_br)
 
+<<<<<<< HEAD
         if not crashed and bird_rect.colliderect(top_rect) and not paused:
             bird_y = top_rect.bottom - bird_h
             crashed = True
@@ -97,6 +110,13 @@ while running:
 
         if not crashed and bird_rect.colliderect(bottom_rect) and not paused:
             bird_y = bottom_rect.top
+=======
+        if not crashed and bird_rect.colliderect(top_rect):
+            crashed = True
+            crash_time = pygame.time.get_ticks()
+
+        if not crashed and bird_rect.colliderect(bottom_rect):
+>>>>>>> 6ed42d4 (Improved Flappy Collision Accuracy)
             crashed = True
             crash_time = pygame.time.get_ticks()
 
@@ -105,12 +125,17 @@ while running:
             pipes.append(create_pipe(width))
             score += 1
 
+<<<<<<< HEAD
     if started and not crashed and not paused:
         if bird_y > height or bird_y < 0:
+=======
+    if started and not crashed:
+        if bird_rect.bottom > height or bird_rect.top < 0:
+>>>>>>> 6ed42d4 (Improved Flappy Collision Accuracy)
             crashed = True
             crash_time = pygame.time.get_ticks()
 
-    screen.blit(bird_img,(100,int(bird_y)))
+    screen.blit(bird_img,(bird_rect.x-offset,bird_rect.y-offset))
 
     text = font.render(f"Score: {score}", True, white)
     screen.blit(text,(width-120,10))
