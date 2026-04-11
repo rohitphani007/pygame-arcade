@@ -8,9 +8,9 @@ from constants import *
 pygame.init()
 screen = pygame.display.set_mode((width,height))
 clock = pygame.time.Clock()
+player_name=""
 
 font = pygame.font.Font(None, 40)
-
 base = os.path.abspath(os.path.join(os.path.dirname(__file__), "assets/launcher"))
 bg = pygame.image.load(os.path.join(base,"bg.png"))
 bg = pygame.transform.scale(bg,(width,height))
