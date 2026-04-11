@@ -56,9 +56,6 @@ while running:
 
         if event.type == pygame.KEYDOWN:
             started = True
-            if event.key == pygame.K_SPACE:
-                bullets.append([player_x+15,player_y])
-
             if event.key == pygame.K_p:
                 paused = not paused
             if event.key == pygame.K_SPACE and not paused:
