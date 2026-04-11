@@ -31,6 +31,7 @@ enemy2 = pygame.image.load(os.path.join(base,"enemy2.png"))
 enemy2 = pygame.transform.scale(enemy2,(40,40))
 
 player_x = width//2
+player_y = height - 40
 
 bullets = []
 enemies = []
@@ -55,11 +56,10 @@ while running:
 
         if event.type == pygame.KEYDOWN:
             started = True
-
             if event.key == pygame.K_p:
                 paused = not paused
             if event.key == pygame.K_SPACE and not paused:
-                bullets.append([player_x+15,height-40])
+                bullets.append([player_x+15,player_y])
 
     if paused:
         paused_text = font.render("PAUSED", True, white)
@@ -71,11 +71,20 @@ while running:
             player_x -= 5
         if keys[pygame.K_RIGHT]:
             player_x += 5
+        if keys[pygame.K_UP]:
+            player_y -= 5
+        if keys[pygame.K_DOWN]:
+            player_y += 5
 
         if player_x > width - 40:
             player_x = width - 40
         elif player_x < 0:
             player_x = 0
+
+        if player_y > height - 40:
+            player_y = height - 40
+        elif player_y < 0:
+            player_y = 0
 
         timer += 1
         if timer % 60 == 0:
@@ -85,8 +94,8 @@ while running:
             img = enemy1 if random.randint(0,1)==0 else enemy2
             enemies.append([random.randint(0,width-40),0,img])
 
-    player_rect = pygame.Rect(player_x,height-40,40,40)
-    screen.blit(player_img,(player_x,height-40))
+    player_rect = pygame.Rect(player_x,player_y,40,40)
+    screen.blit(player_img,(player_x,player_y))
 
     for bullet in bullets[:]:
         if started and not paused:
