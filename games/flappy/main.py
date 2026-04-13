@@ -9,16 +9,17 @@ from colors import *
 from constants import *
 
 def run_flappy(screen):
+
     clock = pygame.time.Clock()
-    font = pygame.font.Font(None,30)
+    font = pygame.font.SysFont("calibri", 30)
 
     base = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../assets/flappy"))
 
-    bg = pygame.image.load(os.path.join(base,"bg.png"))
-    bg = pygame.transform.scale(bg,(width,height))
+    bg = pygame.image.load(os.path.join(base,"bg.png")).convert()
+    bg = pygame.transform.smoothscale(bg,(width,height))
 
-    bird_img = pygame.image.load(os.path.join(base,"bird.png"))
-    bird_img = pygame.transform.scale(bird_img,(40,40))
+    bird_img = pygame.image.load(os.path.join(base,"bird.png")).convert_alpha()
+    bird_img = pygame.transform.smoothscale(bird_img,(40,40))
 
     bird_w, bird_h = bird_img.get_size()
 
@@ -52,6 +53,30 @@ def run_flappy(screen):
     while running:
         screen.blit(bg,(0,0))
 
+        gradient = pygame.Surface((width, height), pygame.SRCALPHA)
+        for y in range(height):
+            alpha = int(120 * (y / height))
+            pygame.draw.line(gradient, (255, 255, 255, alpha), (0, y), (width, y))
+        screen.blit(gradient, (0, 0))
+
+        cloud_shapes = [
+            (60, 50, 160, 44),
+            (240, 40, 140, 38),
+            (440, 70, 130, 34),
+        ]
+        for cx, cy, cw, ch in cloud_shapes:
+            pygame.draw.ellipse(screen, (245, 247, 255, 220), (cx, cy, cw, ch))
+            pygame.draw.ellipse(screen, (255, 255, 255, 180), (cx + 10, cy + 10, cw - 30, ch - 16))
+
+        pygame.draw.line(screen, (245, 247, 255, 130), (0, height - 56), (width, height - 56), 3)
+
+        vignette = pygame.Surface((width, height), pygame.SRCALPHA)
+        max_radius = max(width, height)
+        for radius in range(0, max_radius, 12):
+            alpha = int(100 * (radius / max_radius))
+            pygame.draw.circle(vignette, (0, 0, 0, alpha), (width // 2, height // 2), radius)
+        screen.blit(vignette, (0, 0))
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return "quit"
@@ -59,11 +84,13 @@ def run_flappy(screen):
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_p:
                     paused = not paused
-                
+
                 if not started:
                     started = True
+
                 if event.key == pygame.K_ESCAPE:
-                    return "menu"                 
+                    return "menu"
+
                 if event.key == pygame.K_SPACE and not crashed and not paused:
                     velocity = -6
 
@@ -79,15 +106,26 @@ def run_flappy(screen):
         bird_rect = bird_rect.inflate(-16, -16)
         offset = (bird_h - bird_rect.height) // 2
 
-        for pipe in pipes:
+        for pipe in pipes[:]:
             if started and not crashed and not paused:
                 pipe[0] -= speed
 
             top_rect = pygame.Rect(pipe[0], 0, pipe_width, pipe[1])
             bottom_rect = pygame.Rect(pipe[0], pipe[1] + pipe[2], pipe_width, height)
 
-            pygame.draw.rect(screen, black, top_rect)
-            pygame.draw.rect(screen, black, bottom_rect)
+            pipe_color = (70, 140, 70)
+            pipe_dark = (50, 100, 50)
+            pipe_highlight = (120, 200, 120)
+
+            pygame.draw.rect(screen, pipe_color, top_rect, border_radius=10)
+            pygame.draw.rect(screen, pipe_color, bottom_rect, border_radius=10)
+
+            cap_height = 12
+            pygame.draw.rect(screen, pipe_dark, (pipe[0]-2, pipe[1]-cap_height, pipe_width+4, cap_height), border_radius=8)
+            pygame.draw.rect(screen, pipe_dark, (pipe[0]-2, pipe[1]+pipe[2], pipe_width+4, cap_height), border_radius=8)
+
+            pygame.draw.rect(screen, pipe_highlight, (pipe[0]+10, 16, 12, pipe[1]-16), border_radius=6)
+            pygame.draw.rect(screen, pipe_highlight, (pipe[0]+10, pipe[1]+pipe[2]+6, 12, height - (pipe[1]+pipe[2]+6)), border_radius=6)
 
             if not crashed and bird_rect.colliderect(top_rect) and not paused:
                 crashed = True
@@ -97,12 +135,12 @@ def run_flappy(screen):
                 crashed = True
                 crash_time = pygame.time.get_ticks()
 
-            if pipe[0] < -pipe_width and not crashed:
+            if pipe[0] < -pipe_width and not crashed and not paused:
                 pipes.remove(pipe)
                 pipes.append(create_pipe(width))
                 score += 1
 
-        if started and not crashed:
+        if started and not crashed and not paused:
             if bird_rect.bottom > height or bird_rect.top < 0:
                 crashed = True
                 crash_time = pygame.time.get_ticks()

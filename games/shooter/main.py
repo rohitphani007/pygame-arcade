@@ -9,25 +9,26 @@ from colors import *
 from constants import *
 
 def run_shooter(screen):
+
     clock = pygame.time.Clock()
     font = pygame.font.Font(None,30)
 
     base = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../assets/shooter"))
 
-    bg = pygame.image.load(os.path.join(base,"bg.png"))
-    bg = pygame.transform.scale(bg,(width,height))
+    bg = pygame.image.load(os.path.join(base,"bg.png")).convert()
+    bg = pygame.transform.smoothscale(bg,(width,height))
 
-    player_img = pygame.image.load(os.path.join(base,"player.png"))
-    player_img = pygame.transform.scale(player_img,(40,40))
+    player_img = pygame.image.load(os.path.join(base,"player.png")).convert_alpha()
+    player_img = pygame.transform.smoothscale(player_img,(40,40))
 
-    bullet_img = pygame.image.load(os.path.join(base,"bullet.png"))
-    bullet_img = pygame.transform.scale(bullet_img,(10,20))
+    bullet_img = pygame.image.load(os.path.join(base,"bullet.png")).convert_alpha()
+    bullet_img = pygame.transform.smoothscale(bullet_img,(10,20))
 
-    enemy1 = pygame.image.load(os.path.join(base,"enemy1.png"))
-    enemy1 = pygame.transform.scale(enemy1,(40,40))
+    enemy1 = pygame.image.load(os.path.join(base,"enemy1.png")).convert_alpha()
+    enemy1 = pygame.transform.smoothscale(enemy1,(40,40))
 
-    enemy2 = pygame.image.load(os.path.join(base,"enemy2.png"))
-    enemy2 = pygame.transform.scale(enemy2,(40,40))
+    enemy2 = pygame.image.load(os.path.join(base,"enemy2.png")).convert_alpha()
+    enemy2 = pygame.transform.smoothscale(enemy2,(40,40))
 
     player_x = width//2
     player_y = height - 40
@@ -55,10 +56,13 @@ def run_shooter(screen):
 
             if event.type == pygame.KEYDOWN:
                 started = True
+
+                if event.key == pygame.K_ESCAPE:
+                    return "menu"
+
                 if event.key == pygame.K_p:
                     paused = not paused
-                if event.key == pygame.K_ESCAPE:
-                    return "menu" 
+
                 if event.key == pygame.K_SPACE and not paused:
                     bullets.append([player_x+15,player_y])
 
@@ -68,6 +72,7 @@ def run_shooter(screen):
 
         if started and not paused:
             keys = pygame.key.get_pressed()
+
             if keys[pygame.K_LEFT]:
                 player_x -= 5
             if keys[pygame.K_RIGHT]:
