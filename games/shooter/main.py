@@ -9,161 +9,132 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../c
 from colors import *
 from constants import *
 
-pygame.init()
-screen = pygame.display.set_mode((width,height))
-clock = pygame.time.Clock()
-font = pygame.font.Font(None,30)
+def run_shooter(screen):
 
-base = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../assets/shooter"))
+    clock = pygame.time.Clock()
+    font = pygame.font.Font(None,30)
 
-bg = pygame.image.load(os.path.join(base,"bg.png"))
-bg = pygame.transform.scale(bg,(width,height))
+    base = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../assets/shooter"))
 
-player_img = pygame.image.load(os.path.join(base,"player.png"))
-player_img = pygame.transform.scale(player_img,(40,40))
+    bg = pygame.image.load(os.path.join(base,"bg.png")).convert()
+    bg = pygame.transform.smoothscale(bg,(width,height))
 
-bullet_img = pygame.image.load(os.path.join(base,"bullet.png"))
-bullet_img = pygame.transform.scale(bullet_img,(10,20))
+    player_img = pygame.image.load(os.path.join(base,"player.png")).convert_alpha()
+    player_img = pygame.transform.smoothscale(player_img,(40,40))
 
-enemy1 = pygame.image.load(os.path.join(base,"enemy1.png"))
-enemy1 = pygame.transform.scale(enemy1,(40,40))
+    bullet_img = pygame.image.load(os.path.join(base,"bullet.png")).convert_alpha()
+    bullet_img = pygame.transform.smoothscale(bullet_img,(10,20))
 
-enemy2 = pygame.image.load(os.path.join(base,"enemy2.png"))
-enemy2 = pygame.transform.scale(enemy2,(40,40))
+    enemy1 = pygame.image.load(os.path.join(base,"enemy1.png")).convert_alpha()
+    enemy1 = pygame.transform.smoothscale(enemy1,(40,40))
 
-player_x = width//2
-player_y = height - 40
+    enemy2 = pygame.image.load(os.path.join(base,"enemy2.png")).convert_alpha()
+    enemy2 = pygame.transform.smoothscale(enemy2,(40,40))
 
-bullets = []
-enemies = []
+    player_x = width//2
+    player_y = height - 40
 
-speed = 0.8
-timer = 0
-score = 0
-started = False
-paused = False
+    bullets = []
+    enemies = []
 
-score_sent = False
-game_over = False
-player_name = input("PLAYER, ENTER YOUR NAME: ")
-top_scores = []
+    speed = 0.8
+    timer = 0
+    score = 0
+    started = False
+    paused = False
 
-while len(enemies) < 2:
-    img = enemy1 if random.randint(0,1)==0 else enemy2
-    enemies.append([random.randint(0,width-40),0,img])
+    while len(enemies) < 2:
+        img = enemy1 if random.randint(0,1)==0 else enemy2
+        enemies.append([random.randint(0,width-40),0,img])
 
-running = True
-while running:
-    screen.blit(bg,(0,0))
+    running = True
+    while running:
+        screen.blit(bg,(0,0))
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return "quit"
 
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                running = False
-            started = True
-            if event.key == pygame.K_p:
-                paused = not paused
-            if event.key == pygame.K_SPACE and not paused and not game_over:
-                bullets.append([player_x+15,player_y])
+            if event.type == pygame.KEYDOWN:
+                started = True
 
-    if paused:
-        paused_text = font.render("PAUSED", True, white)
-        screen.blit(paused_text, (width//2 - 50,height//2 - 15))
+                if event.key == pygame.K_ESCAPE:
+                    return "menu"
 
-    if started and not paused and not game_over:
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
-            player_x -= 5
-        if keys[pygame.K_RIGHT]:
-            player_x += 5
-        if keys[pygame.K_UP]:
-            player_y -= 5
-        if keys[pygame.K_DOWN]:
-            player_y += 5
+                if event.key == pygame.K_p:
+                    paused = not paused
 
-        if player_x > width - 40:
-            player_x = width - 40
-        elif player_x < 0:
-            player_x = 0
+                if event.key == pygame.K_SPACE and not paused:
+                    bullets.append([player_x+15,player_y])
 
-        if player_y > height - 40:
-            player_y = height - 40
-        elif player_y < 0:
-            player_y = 0
+        if paused:
+            paused_text = font.render("PAUSED", True, white)
+            screen.blit(paused_text, (width//2 - 50,height//2 - 15))
 
-        timer += 1
-        if timer % 60 == 0:
-            speed += 0.03
+        if started and not paused:
+            keys = pygame.key.get_pressed()
 
-        while len(enemies) < 2:
-            img = enemy1 if random.randint(0,1)==0 else enemy2
-            enemies.append([random.randint(0,width-40),0,img])
+            if keys[pygame.K_LEFT]:
+                player_x -= 5
+            if keys[pygame.K_RIGHT]:
+                player_x += 5
+            if keys[pygame.K_UP]:
+                player_y -= 5
+            if keys[pygame.K_DOWN]:
+                player_y += 5
 
-    player_rect = pygame.Rect(player_x,player_y,40,40)
-    screen.blit(player_img,(player_x,player_y))
+            if player_x > width - 40:
+                player_x = width - 40
+            elif player_x < 0:
+                player_x = 0
 
-    for bullet in bullets[:]:
-        if started and not paused and not game_over:
-            bullet[1] -= 7
-        screen.blit(bullet_img,(bullet[0],bullet[1]))
-        if bullet[1] < 0:
-            bullets.remove(bullet)
+            if player_y > height - 40:
+                player_y = height - 40
+            elif player_y < 0:
+                player_y = 0
 
-    for enemy in enemies[:]:
-        if started and not paused and not game_over:
-            enemy[1] += speed
-        screen.blit(enemy[2],(enemy[0],enemy[1]))
+            timer += 1
+            if timer % 60 == 0:
+                speed += 0.03
 
-        enemy_rect = pygame.Rect(enemy[0],enemy[1],40,40)
+            while len(enemies) < 2:
+                img = enemy1 if random.randint(0,1)==0 else enemy2
+                enemies.append([random.randint(0,width-40),0,img])
 
-        if started and not game_over and (enemy_rect.colliderect(player_rect) or enemy[1] > height):
-            game_over = True
+        player_rect = pygame.Rect(player_x,player_y,40,40)
+        screen.blit(player_img,(player_x,player_y))
 
         for bullet in bullets[:]:
-            bullet_rect = pygame.Rect(bullet[0],bullet[1],10,20)
-            if bullet_rect.colliderect(enemy_rect) and not game_over:
+            if started and not paused:
+                bullet[1] -= 7
+            screen.blit(bullet_img,(bullet[0],bullet[1]))
+            if bullet[1] < 0:
                 bullets.remove(bullet)
-                enemies.remove(enemy)
-                score += 1
-                break
 
-    text = font.render(f"Score: {score}", True, white)
-    screen.blit(text,(width-120,10))
+        for enemy in enemies[:]:
+            if started and not paused:
+                enemy[1] += speed
+            screen.blit(enemy[2],(enemy[0],enemy[1]))
 
-    if not started:
-        msg = font.render("Press any key to start", True, white)
-        screen.blit(msg,(180,180))
+            enemy_rect = pygame.Rect(enemy[0],enemy[1],40,40)
 
-    if game_over:
-        if not score_sent:
-            leaderboard.submit_score(player_name, score)
-            top_scores = leaderboard.get_top_scores()
-            score_sent = True
-        
-        overlay = pygame.Surface((width, height))
-        overlay.set_alpha(180)
-        overlay.fill((0, 0, 0))
-        screen.blit(overlay, (0, 0))
+            if started and (enemy_rect.colliderect(player_rect) or enemy[1] > height):
+                return "menu"
 
-        msg = font.render("GAME OVER", True, red)
-        screen.blit(msg, (width // 2 - 60, height // 2 - 80))
-        
-        title = font.render("GLOBAL TOP 5 (SHOOTER):", True, (255, 215, 0))
-        screen.blit(title, (width // 2 - 120, height // 2 - 40))
+            for bullet in bullets[:]:
+                bullet_rect = pygame.Rect(bullet[0],bullet[1],10,20)
+                if bullet_rect.colliderect(enemy_rect):
+                    bullets.remove(bullet)
+                    enemies.remove(enemy)
+                    score += 1
+                    break
 
-        y_off = 0
-        for entry in top_scores:
-            y_off += 30
-            score_txt = font.render(f"{entry['name']}: {entry['score']}", True, white)
-            screen.blit(score_txt, (width // 2 - 100, height // 2 - 40 + y_off))
+        text = font.render(f"Score: {score}", True, white)
+        screen.blit(text,(width-120,10))
 
-        restart_msg = font.render("Press Esc to Quit", True, (200, 200, 200))
-        screen.blit(restart_msg, (width // 2 - 70, height // 2 + 150))
+        if not started:
+            msg = font.render("Press any key to start", True, white)
+            screen.blit(msg,(180,180))
 
-    pygame.display.update()
-    clock.tick(fps)
-
-pygame.quit()
+        pygame.display.update()
+        clock.tick(fps)
